@@ -1,0 +1,28 @@
+name: ollama_chat
+description: "A new Flutter project."
+publish_to: "none"
+version: 0.1.0
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # to work with dates
+  intl: ^0.19.0
+  # to work with app storage
+  path_provider: ^2.1.2
+  # open links
+  url_launcher: ^6.2.5
+  # make http requests
+  http: ^1.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
