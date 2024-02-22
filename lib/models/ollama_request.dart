@@ -42,6 +42,9 @@ class OllamaRequestModel {
         )
         .asStream();
 
+    // don't know, I wonder if this is a limitation on Darts side?
+    // because it feels like only after the response has been fully generated
+    // does it actually run this part
     await for (final chunk in streamedResponse) {
       final lines = (utf8.decode(chunk.bodyBytes).split('\n'));
 
@@ -52,12 +55,5 @@ class OllamaRequestModel {
         }
       }
     }
-
-    // for (final line in responseLines) {
-    //   if (line.isNotEmpty) {
-    //     final decodedChunk = OllamaResponseModel.fromJson(json.decode(line));
-    //     yield decodedChunk;
-    //   }
-    // }
   }
 }

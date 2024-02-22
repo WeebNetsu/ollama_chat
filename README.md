@@ -9,7 +9,7 @@ To run this software, you need to install [Ollama](https://github.com/ollama/oll
 ## Running
 
 1. Make sure you have [Flutter](https://) and [Dart](https://) installed on your system.
-1. Clone this repo `git clone https://github.com/WeebNetsu/social_ollama.git`
+1. Clone this repo `git clone https://github.com/WeebNetsu/ollama_chat.git`
 1. Open your terminal in the repo folder.
 1. `flutter pub get` (install dependencies)
 1. `flutter run`
