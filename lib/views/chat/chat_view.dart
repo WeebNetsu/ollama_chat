@@ -21,6 +21,7 @@ class ChatView extends StatefulWidget {
 
 class _ChatViewState extends State<ChatView> {
   final TextEditingController _messageController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   final OllamaRequestModel ai = OllamaRequestModel("mistral");
 
 //   final StreamController<OllamaResponseModel> _responseController = StreamController<OllamaResponseModel>();
@@ -31,6 +32,7 @@ class _ChatViewState extends State<ChatView> {
 
   @override
   void dispose() {
+    _scrollController.dispose(); // Dispose the ScrollController when not needed
     // _responseController.close(); // Close the stream controller when not needed
     super.dispose();
   }
@@ -65,29 +67,55 @@ class _ChatViewState extends State<ChatView> {
     }
 
     setState(() {
-      _allMessages.add(MessageModel(newResponse, bot: true));
+      _allMessages.add(MessageModel(newResponse.trim(), bot: true));
       //   _responses.clear();
     });
   }
 
+  void _scrollToBottom() {
+    _scrollController.animateTo(
+      _scrollController.position.maxScrollExtent,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
+  }
+
+//   @override
+//   void didUpdateWidget(ChatView chatWidget) {
+//     super.didUpdateWidget(chatWidget);
+//     _scrollToBottom();
+//   }
+
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToBottom();
+    });
+
     return Scaffold(
       body: Stack(
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ..._allMessages.map((message) {
-                if (message.bot) {
-                  return BotChatBubble(message: message.message);
-                }
-                return Align(
-                  alignment: Alignment.topRight,
-                  child: UserChatBubble(message: message.message),
-                );
-              }),
-            ],
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height - 100, // Adjust the height as per your requirements
+            ),
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ..._allMessages.map((message) {
+                    if (message.bot) {
+                      return BotChatBubble(message: message.message);
+                    }
+                    return Align(
+                      alignment: Alignment.topRight,
+                      child: UserChatBubble(message: message.message),
+                    );
+                  }),
+                ],
+              ),
+            ),
           ),
           InputSend(onPressed: sendMessage, controller: _messageController),
         ],
