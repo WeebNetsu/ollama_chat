@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:ollama_chat/models/ollama_request.dart';
+import 'package:ollama_chat/models/models.dart';
 import 'package:ollama_chat/utils/utils.dart';
+import 'package:ollama_chat/views/chat/widgets/chat_widgets.dart';
+import 'package:ollama_chat/widgets/widgets.dart';
 
 class ChatView extends StatefulWidget {
   const ChatView({super.key});
@@ -18,12 +20,14 @@ class ChatView extends StatefulWidget {
 }
 
 class _ChatViewState extends State<ChatView> {
-  final TextEditingController _textController = TextEditingController();
+  final TextEditingController _messageController = TextEditingController();
   final OllamaRequestModel ai = OllamaRequestModel("mistral");
 
 //   final StreamController<OllamaResponseModel> _responseController = StreamController<OllamaResponseModel>();
 //   final List<String> _responses = [];
-  final List<String> _completedResponses = ['Hi! What can I help you with today?'];
+  final List<MessageModel> _allMessages = [
+    MessageModel('Hi! What can I help you with today?', bot: true),
+  ];
 
   @override
   void dispose() {
@@ -32,8 +36,8 @@ class _ChatViewState extends State<ChatView> {
   }
 
   Future<void> sendMessage() async {
-    String message = _textController.text;
-    _textController.clear();
+    String message = _messageController.text;
+    _messageController.clear();
 
     if (message.isEmpty) {
       showMessage(context, "Message cannot be empty");
@@ -42,8 +46,10 @@ class _ChatViewState extends State<ChatView> {
     String newResponse = "";
     int index = 0;
 
+    _allMessages.add(MessageModel(message));
+
     setState(() {
-      _completedResponses.add("Thinking real hard...");
+      _allMessages.add(MessageModel("Thinking real hard...", bot: true));
     });
 
     await for (final chunk in ai.sendMessage(message)) {
@@ -51,7 +57,7 @@ class _ChatViewState extends State<ChatView> {
       //   _responses.add(chunk.response);
       newResponse += chunk.response;
 
-      if (index == 0) _completedResponses.removeLast();
+      if (index == 0) _allMessages.removeLast();
       index++;
 
       // it's actually really fast (I'm assuming), this makes it feel more ChatGPT-like
@@ -59,7 +65,7 @@ class _ChatViewState extends State<ChatView> {
     }
 
     setState(() {
-      _completedResponses.add(newResponse);
+      _allMessages.add(MessageModel(newResponse, bot: true));
       //   _responses.clear();
     });
   }
@@ -69,58 +75,21 @@ class _ChatViewState extends State<ChatView> {
     return Scaffold(
       body: Stack(
         children: [
-          SizedBox(height: 10), // Size specified here
           Column(
-            children: _completedResponses.map((cr) {
-              return Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: Text(cr),
-                  ),
-                  SizedBox(height: 20),
-                ],
-              );
-            }).toList(),
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ..._allMessages.map((message) {
+                if (message.bot) {
+                  return BotChatBubble(message: message.message);
+                }
+                return Align(
+                  alignment: Alignment.topRight,
+                  child: UserChatBubble(message: message.message),
+                );
+              }),
+            ],
           ),
-          //   StreamBuilder<OllamaResponseModel>(
-          //     stream: _responseController.stream,
-          //     builder: (context, snapshot) {
-          //       if (snapshot.hasData) {
-          //         return Text(_responses.join());
-          //       } else if (snapshot.hasError) {
-          //         return Text('Error: ${snapshot.error}');
-          //       } else {
-          //         return const Text('Hi! What can I help you with today?');
-          //       }
-          //     },
-          //   ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      decoration: const InputDecoration(
-                        hintText: 'Enter your text...',
-                        border: OutlineInputBorder(),
-                      ),
-                      controller: _textController,
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: sendMessage,
-                    child: const Icon(
-                      Icons.send,
-                      color: Colors.blue,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          InputSend(onPressed: sendMessage, controller: _messageController),
         ],
       ),
     );
