@@ -72,6 +72,15 @@ class _ChatViewState extends State<ChatView> {
     });
   }
 
+  void clearMessages() {
+    setState(() {
+      _allMessages.clear();
+      _allMessages.add(
+        MessageModel('Hi! What can I help you with today?', bot: true),
+      );
+    });
+  }
+
   void _scrollToBottom() {
     _scrollController.animateTo(
       _scrollController.position.maxScrollExtent,
@@ -97,7 +106,7 @@ class _ChatViewState extends State<ChatView> {
         children: [
           ConstrainedBox(
             constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height - 100, // Adjust the height as per your requirements
+              maxHeight: MediaQuery.of(context).size.height - 110, // Adjust the height as per your requirements
             ),
             child: SingleChildScrollView(
               controller: _scrollController,
@@ -117,7 +126,11 @@ class _ChatViewState extends State<ChatView> {
               ),
             ),
           ),
-          InputSend(onPressed: sendMessage, controller: _messageController),
+          InputSend(
+            onPressed: sendMessage,
+            controller: _messageController,
+            onClear: clearMessages,
+          ),
         ],
       ),
     );
