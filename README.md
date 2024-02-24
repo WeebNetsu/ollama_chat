@@ -2,6 +2,16 @@
 
 UI for chatting with AI.
 
+## Why use it
+
+- Works offline
+- Can use any model available [here](https://ollama.com/library)
+- Uncensored\*
+- Open Source
+- Fast Responses\*
+
+\* Depending on the model of your choice
+
 ## Requirements
 
 To run this software, you need to install [Ollama](https://github.com/ollama/ollama) and then install the Mistral model (`ollama run mistral`). Make sure that Ollama is running before you run this software.
@@ -19,6 +29,16 @@ To run this software, you need to install [Ollama](https://github.com/ollama/oll
 Currently only tested on the latest `MacOs`, but it should run fine on `Linux` - running on `Windows` may require tweaking.
 
 No Android/iOS support planned.
+
+#### System Requirements
+
+##### Minimum
+
+- 8GB RAM
+
+## Preview
+
+![Chat with AI](assets/readme/preview.jpg)
 
 ---
 
